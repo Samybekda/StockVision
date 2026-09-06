@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Mouvements{% endblock %}
+{% block page_title %}Historique des Mouvements de Stock{% endblock %}
+
+{% block content %}
+<!-- Filtres et Enregistrement rapide -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+  <div class="card-body p-3">
+    <form method="GET" action="{{ url_for('movements.list_movements') }}" class="row g-2 align-items-center">
+      <!-- Filtre par Produit -->
+      <div class="col-12 col-md-5">
+        <select name="product_id" class="form-select">
+          <option value="">Tous les produits</option>
+          {% for p in products %}
+            <option value="{{ p.id }}" {% if selected_product_id == p.id %}selected{% endif %}>
+              {{ p.name }} ({{ p.reference }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Filtre par Type -->
+      <div class="col-12 col-md-3">
+        <select name="type" class="form-select">
+          <option value="">Tous les types</option>
+          <option value="IN" {% if selected_type == 'IN' %}selected{% endif %}>Entrées (IN) uniquement</option>
+          <option value="OUT" {% if selected_type == 'OUT' %}selected{% endif %}>Sorties (OUT) uniquement</option>
+        </select>
+      </div>
+
+      <!-- Boutons -->
+      <div class="col-12 col-md-4 d-flex gap-2 justify-content-md-end">
+        <button type="submit" class="btn btn-secondary btn-sm px-3">
+          <i class="bi bi-funnel"></i> Filtrer
+        </button>
+        {% if selected_product_id or selected_type %}
+          <a href="{{ url_for('movements.list_movements') }}" class="btn btn-outline-secondary btn-sm" title="Réinitialiser">
+            <i class="bi bi-x-circle"></i>
+          </a>
+        {% endif %}
+        <button type="button" class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#quickMovementModal">
+          <i class="bi bi-plus-lg"></i> Nouveau Mouvement
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tableau des Mouvements -->
+<div class="card border-0 shadow-sm rounded-3">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+    <h2 class="h6 mb-0 fw-bold">
+      Transactions Enregistrées <span class="badge bg-secondary rounded-pill ms-2">{{ total_count }}</span>
+    </h2>
+    <small class="text-muted">Tri antéchronologique (les plus récents en premier)</small>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Date & Heure</th>
+          <th>Référence</th>
+          <th>Nom du Produit</th>
+          <th>Catégorie</th>
+          <th class="text-center">Type</th>
+          <th class="text-center">Quantité</th>
+          <th>Commentaire / Motif</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in movements %}
+          <tr>
+            <td class="text-muted small">
+              <i class="bi bi-clock me-1"></i> {{ m.date.strftime('%d/%m/%Y %H:%M') }}
+            </td>
+            <td>
+              <span class="badge bg-light text-dark font-monospace border">{{ m.product.reference }}</span>
+            </td>
+            <td>
+              <strong>{{ m.product.name }}</strong>
+            </td>
+            <td>
+              <span class="badge bg-secondary bg-opacity-10 text-secondary border">
+                {{ m.product.category.name if m.product.category else '—' }}
+              </span>
+            </td>
+            <td class="text-center">
+              {% if m.movement_type == 'IN' %}
+                <span class="badge badge-mvt-in"><i class="bi bi-arrow-down-left"></i> ENTRÉE</span>
+              {% else %}
+                <span class="badge badge-mvt-out"><i class="bi bi-arrow-up-right"></i> SORTIE</span>
+              {% endif %}
+            </td>
+            <td class="text-center font-monospace fs-6 fw-bold">
+              {% if m.movement_type == 'IN' %}
+                <span class="text-success">+{{ m.quantity }}</span>
+              {% else %}
+                <span class="text-danger">-{{ m.quantity }}</span>
+              {% endif %}
+            </td>
+            <td class="text-muted small">
+              {{ m.comment or "—" }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-5">
+              <i class="bi bi-arrow-left-right fs-1 d-block mb-2 text-secondary"></i>
+              Aucun mouvement trouvé pour ces critères.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

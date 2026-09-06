@@ -1,0 +1,351 @@
+/* StockVision — Styles personnalisés et interface moderne */
+
+:root {
+  --sv-sidebar-bg: #0f172a;
+  --sv-sidebar-text: #94a3b8;
+  --sv-sidebar-active: #38bdf8;
+  --sv-sidebar-active-bg: rgba(56, 189, 248, 0.12);
+  --sv-body-bg: #f8fafc;
+  --sv-card-bg: #ffffff;
+  --sv-text-dark: #1e293b;
+  --sv-border: #e2e8f0;
+  --sv-primary: #2563eb;
+  --sv-success: #10b981;
+  --sv-danger: #ef4444;
+  --sv-warning: #f59e0b;
+}
+
+body {
+  background-color: var(--sv-body-bg);
+  color: var(--sv-text-dark);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* Structure Sidebar */
+#wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+#sidebar {
+  width: 260px;
+  background-color: var(--sv-sidebar-bg);
+  color: var(--sv-sidebar-text);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+#sidebar .brand {
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#sidebar .brand h5 {
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+#sidebar .brand small {
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+#sidebar .nav-link {
+  color: var(--sv-sidebar-text);
+  padding: 0.85rem 1.25rem;
+  font-weight: 500;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  margin: 0.2rem 0.75rem;
+  transition: all 0.2s ease;
+}
+
+#sidebar .nav-link i {
+  font-size: 1.15rem;
+  margin-right: 0.75rem;
+  color: #64748b;
+  transition: color 0.2s ease;
+}
+
+#sidebar .nav-link:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+#sidebar .nav-link:hover i {
+  color: #ffffff;
+}
+
+#sidebar .nav-link.active {
+  color: var(--sv-sidebar-active);
+  background-color: var(--sv-sidebar-active-bg);
+  font-weight: 600;
+}
+
+#sidebar .nav-link.active i {
+  color: var(--sv-sidebar-active);
+}
+
+#sidebar .nav-section-title {
+  padding: 1.2rem 1.5rem 0.4rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #475569;
+  font-weight: 700;
+}
+
+/* Zone principale de contenu */
+#page-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.top-navbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--sv-border);
+  padding: 0.75rem 1.5rem;
+}
+
+.content-container {
+  padding: 1.75rem 2rem;
+  flex-grow: 1;
+}
+
+/* Cartes KPI */
+.kpi-card {
+  border: 1px solid var(--sv-border);
+  border-radius: 12px;
+  background: var(--sv-card-bg);
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+}
+
+.kpi-card .kpi-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-card .kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.kpi-card .kpi-icon {
+  position: absolute;
+  right: 1.25rem;
+  top: 1.25rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.icon-blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.icon-green {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.icon-red {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.icon-purple {
+  background-color: #faf5ff;
+  color: #7c3aed;
+}
+
+.icon-cyan {
+  background-color: #ecfeff;
+  color: #0891b2;
+}
+
+/* Graphiques & conteneurs */
+.chart-card {
+  border: 1px solid var(--sv-border);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  height: 100%;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--sv-border);
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Badges de statut */
+.badge-stock-normal {
+  background-color: #d1fae5;
+  color: #065f46;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+}
+
+.badge-stock-low {
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+  }
+}
+
+/* Badges mouvements */
+.badge-mvt-in {
+  background-color: #dcfce7;
+  color: #15803d;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+}
+
+.badge-mvt-out {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+}
+
+/* Badges tendances */
+.badge-trend-up {
+  background-color: #fef3c7;
+  color: #b45309;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-trend-down {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-trend-stable {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Tables */
+.table-custom {
+  margin: 0;
+}
+
+.table-custom thead th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--sv-border);
+  padding: 0.85rem 1rem;
+}
+
+.table-custom tbody td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--sv-border);
+  font-size: 0.92rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Modales */
+.modal-header {
+  border-bottom: 1px solid var(--sv-border);
+  background-color: #f8fafc;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--sv-border);
+  background-color: #f8fafc;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  #sidebar {
+    margin-left: -260px;
+    position: fixed;
+    height: 100vh;
+  }
+  #sidebar.active {
+    margin-left: 0;
+  }
+}

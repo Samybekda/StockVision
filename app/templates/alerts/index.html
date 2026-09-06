@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Alertes Stock Faible{% endblock %}
+{% block page_title %}Alertes & Réapprovisionnement{% endblock %}
+
+{% block content %}
+<!-- En-tête informatif avec métriques d'urgence -->
+{% if total_alerts > 0 %}
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+      <div class="alert alert-danger border-danger shadow-sm h-100 d-flex align-items-center mb-0">
+        <div class="fs-1 me-3 text-danger">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+          <h2 class="h5 alert-heading fw-bold mb-1">{{ total_alerts }} produit(s) sous le seuil critique</h2>
+          <p class="mb-0 small text-danger-emphasis">
+            Ces produits risquent une rupture imminente. Des actions de réapprovisionnement doivent être engagées.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <div class="card border-0 shadow-sm h-100 p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="text-muted small text-uppercase fw-semibold">Coût estimé du réassort de sécurité</div>
+            <div class="fs-3 fw-bold text-dark">{{ "{:,.2f}".format(reorder_cost) }} €</div>
+            <div class="text-muted small">Pour ramener tous les produits au niveau de leur seuil minimum</div>
+          </div>
+          <div class="rounded-circle bg-white p-3 shadow-sm text-primary fs-3">
+            <i class="bi bi-cart-plus"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Tableau exclusif des produits en alerte -->
+<div class="card border-0 shadow-sm rounded-3">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+    <h2 class="h6 mb-0 fw-bold text-danger">
+      <i class="bi bi-bell-fill me-2"></i>Produits Nécessitant une Action Immédiate
+    </h2>
+    <span class="badge bg-danger rounded-pill">{{ total_alerts }} alerte(s)</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Nom du Produit</th>
+          <th>Catégorie</th>
+          <th class="text-end">Prix Unitaire</th>
+          <th class="text-center">Seuil Min.</th>
+          <th class="text-center">Stock Actuel</th>
+          <th class="text-center">Déficit (Manquant)</th>
+          <th class="text-end">Action Rapide</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+          <tr>
+            <td>
+              <span class="badge bg-light text-dark font-monospace border">{{ p.reference }}</span>
+            </td>
+            <td>
+              <div class="fw-bold text-dark">{{ p.name }}</div>
+            </td>
+            <td>
+              <span class="badge bg-secondary bg-opacity-10 text-secondary border">
+                {{ p.category.name if p.category else '—' }}
+              </span>
+            </td>
+            <td class="text-end font-monospace">{{ "{:,.2f}".format(p.unit_price) }} €</td>
+            <td class="text-center text-muted fw-semibold">{{ p.min_threshold }}</td>
+            <td class="text-center">
+              <span class="badge-stock-low">
+                <i class="bi bi-exclamation-circle-fill"></i> {{ p.current_quantity }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="badge bg-warning text-dark font-monospace fs-6 px-3 py-1">
+                +{{ p.deficit }} unité(s)
+              </span>
+            </td>
+            <td class="text-end">
+              <button type="button" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1"
+                      data-bs-toggle="modal" data-bs-target="#quickMovementModal"
+                      data-product-id="{{ p.id }}" data-type="IN" data-suggested-qty="{{ p.deficit }}"
+                      title="Enregistrer une entrée de réassort">
+                <i class="bi bi-cart-check"></i> Réapprovisionner
+              </button>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <div class="text-success mb-2 fs-1">
+                <i class="bi bi-check-circle-fill"></i>
+              </div>
+              <h3 class="h5 fw-bold text-dark">Tous les niveaux de stock sont optimaux</h3>
+              <p class="text-muted small mb-0">
+                Aucun produit n'est actuellement en dessous de son seuil d'alerte.
+              </p>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

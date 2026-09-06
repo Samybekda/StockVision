@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Analyse des Tendances{% endblock %}
+{% block page_title %}Analyse Statistique de la Consommation{% endblock %}
+
+{% block content %}
+<!-- Fiche explicative de la méthode statistique -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3 fs-3">
+        <i class="bi bi-lightbulb-fill"></i>
+      </div>
+      <div>
+        <h2 class="h5 fw-bold mb-2 text-dark">Méthodologie de Calcul de la Tendance</h2>
+        <p class="text-muted mb-3">
+          Pour chaque produit, l'indicateur évalue le rythme d'écoulement du stock sans recourir à des modèles "boîte noire" de machine learning. 
+          Il repose sur une comparaison rigoureuse et déterministe entre deux fenêtres temporelles glissantes :
+        </p>
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <div class="p-3 rounded-2 bg-light border">
+              <strong class="d-block text-dark mb-1">
+                <i class="bi bi-calendar-check text-primary me-1"></i> Période Récente (J-30 à J)
+              </strong>
+              <small class="text-muted">
+                Somme des unités sorties (sorties réelles) sur les 30 derniers jours calendaires.
+              </small>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="p-3 rounded-2 bg-light border">
+              <strong class="d-block text-dark mb-1">
+                <i class="bi bi-calendar-range text-secondary me-1"></i> Période Antérieure (J-60 à J-30)
+              </strong>
+              <small class="text-muted">
+                Somme des unités sorties sur la période de référence précédente de même durée.
+              </small>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="p-3 rounded-2 bg-light border">
+              <strong class="d-block text-dark mb-1">
+                <i class="bi bi-calculator text-success me-1"></i> Règle de Décision
+              </strong>
+              <small class="text-muted">
+                <strong>Hausse (↑)</strong> si Récent > Antérieur &bull; 
+                <strong>Baisse (↓)</strong> si Récent < Antérieur &bull; 
+                <strong>Stable (→)</strong> si égalité.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Synthèse des tendances -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-label">Références Analysées</div>
+      <div class="kpi-value">{{ total_analyzed }}</div>
+      <div class="text-muted small mt-1">Échantillon sous surveillance</div>
+      <div class="kpi-icon icon-blue">
+        <i class="bi bi-boxes"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-label">Demande en Hausse</div>
+      <div class="kpi-value text-warning">{{ hausse_count }}</div>
+      <div class="text-muted small mt-1">Accélération des sorties</div>
+      <div class="kpi-icon" style="background-color: #fef3c7; color: #b45309;">
+        <i class="bi bi-arrow-up-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-label">Demande en Baisse</div>
+      <div class="kpi-value text-primary">{{ baisse_count }}</div>
+      <div class="text-muted small mt-1">Ralentissement de la demande</div>
+      <div class="kpi-icon" style="background-color: #e0e7ff; color: #3730a3;">
+        <i class="bi bi-arrow-down-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-label">Demande Stable</div>
+      <div class="kpi-value text-secondary">{{ stable_count }}</div>
+      <div class="text-muted small mt-1">Volumes de sortie constants</div>
+      <div class="kpi-icon" style="background-color: #f1f5f9; color: #475569;">
+        <i class="bi bi-arrow-right"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tableau complet d'analyse par produit -->
+<div class="card border-0 shadow-sm rounded-3">
+  <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+    <h2 class="h6 mb-0 fw-bold">Détail des Tendances par Produit</h2>
+    <small class="text-muted">Calcul recalculé dynamiquement sur la base des mouvements</small>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-custom table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Nom du Produit</th>
+          <th class="text-center">Sorties (30j récents)</th>
+          <th class="text-center">Sorties (30j antérieurs)</th>
+          <th class="text-center">Variation (&Delta;)</th>
+          <th class="text-center">Tendance</th>
+          <th>Interprétation Opérationnelle</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in trends %}
+          <tr>
+            <td>
+              <span class="badge bg-light text-dark font-monospace border">{{ t.product_reference }}</span>
+            </td>
+            <td>
+              <strong class="text-dark">{{ t.product_name }}</strong>
+            </td>
+            <td class="text-center font-monospace fw-bold">{{ t.recent_exits }}</td>
+            <td class="text-center font-monospace text-muted">{{ t.previous_exits }}</td>
+            <td class="text-center font-monospace">
+              {% if t.delta > 0 %}
+                <span class="text-success fw-bold">+{{ t.delta }}</span>
+              {% elif t.delta < 0 %}
+                <span class="text-danger fw-bold">{{ t.delta }}</span>
+              {% else %}
+                <span class="text-muted">0</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <span class="{{ t.badge_class }}">
+                <i class="bi {{ t.icon }}"></i> {{ t.label }}
+              </span>
+            </td>
+            <td class="small text-muted">
+              {{ t.explanation }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              Aucun produit à analyser pour le moment.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

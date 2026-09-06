@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Importer un CSV{% endblock %}
+{% block page_title %}Importation de Données de Stock (CSV){% endblock %}
+
+{% block content %}
+<!-- Contexte métier & pédagogique -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3 fs-3">
+        <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+      </div>
+      <div>
+        <h2 class="h5 fw-bold mb-1 text-dark">Remplacer la gestion manuelle par le numérique</h2>
+        <p class="text-muted mb-2">
+          Au lieu de noter et comptabiliser les stocks sur des fiches papier, importez votre fichier CSV pour alimenter directement la base de données permanente SQLite.
+        </p>
+        <div class="d-flex flex-wrap gap-2 pt-1">
+          <span class="badge bg-light text-dark border">
+            <i class="bi bi-shield-check text-success me-1"></i> Détection automatique virgule ou point-virgule
+          </span>
+          <span class="badge bg-light text-dark border">
+            <i class="bi bi-folder-plus text-primary me-1"></i> Création automatique des catégories
+          </span>
+          <span class="badge bg-light text-dark border">
+            <i class="bi bi-arrow-repeat text-info me-1"></i> Mise à jour sans doublons (clé logique : référence)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulaire d'upload de fichier -->
+<div class="row g-4 mb-4">
+  <div class="col-12 col-lg-7">
+    <div class="card border-0 shadow-sm rounded-3 h-100">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h3 class="h6 mb-0 fw-bold text-dark">
+          <i class="bi bi-upload text-primary me-2"></i>Sélectionner le fichier CSV
+        </h3>
+        <a href="{{ url_for('main.download_sample_csv') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
+          <i class="bi bi-download"></i> Télécharger l'exemple (example_stock.csv)
+        </a>
+      </div>
+      <div class="card-body p-4">
+        <form action="{{ url_for('main.import_csv') }}" method="POST" enctype="multipart/form-data">
+          <div class="mb-4">
+            <label for="csvFileInput" class="form-label fw-semibold">
+              Fichier CSV sur votre ordinateur <span class="text-danger">*</span>
+            </label>
+            <input class="form-control form-control-lg" type="file" id="csvFileInput" name="file" accept=".csv" required>
+            <div class="form-text mt-2">
+              Formats acceptés : <code>.csv</code> (séparateur virgule <code>,</code> ou point-virgule <code>;</code>, encodage UTF-8 ou Excel avec BOM).
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+            <span class="text-muted small">
+              <i class="bi bi-info-circle me-1"></i> Les données seront immédiatement persistées dans SQLite.
+            </span>
+            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center gap-2">
+              <i class="bi bi-cloud-arrow-up-fill fs-5"></i> Importer dans StockVision
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Format attendu -->
+  <div class="col-12 col-lg-5">
+    <div class="card border-0 shadow-sm rounded-3 h-100">
+      <div class="card-header bg-white py-3 border-bottom">
+        <h3 class="h6 mb-0 fw-bold text-dark">
+          <i class="bi bi-table text-secondary me-2"></i>Format des Colonnes
+        </h3>
+      </div>
+      <div class="card-body p-3">
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered align-middle mb-2 small">
+            <thead class="table-light">
+              <tr>
+                <th>Colonne</th>
+                <th>Type</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>reference</code></td>
+                <td>Texte</td>
+                <td><span class="badge bg-danger">Obligatoire</span></td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>Texte</td>
+                <td><span class="badge bg-danger">Obligatoire</span></td>
+              </tr>
+              <tr>
+                <td><code>category</code></td>
+                <td>Texte</td>
+                <td><span class="badge bg-danger">Obligatoire</span></td>
+              </tr>
+              <tr>
+                <td><code>current_quantity</code></td>
+                <td>Entier (&ge; 0)</td>
+                <td><span class="badge bg-danger">Obligatoire</span></td>
+              </tr>
+              <tr>
+                <td><code>min_threshold</code></td>
+                <td>Entier (&ge; 0)</td>
+                <td><span class="badge bg-danger">Obligatoire</span></td>
+              </tr>
+              <tr>
+                <td><code>unit_price</code></td>
+                <td>Nombre (&ge; 0.0)</td>
+                <td><span class="badge bg-secondary">Optionnel (défaut 0.0)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bg-light p-2 rounded border small font-monospace">
+          reference,name,category,current_quantity,min_threshold,unit_price<br>
+          PC001,Ordinateur portable,Informatique,15,5,750<br>
+          CL001,Clavier ergonomique,Accessoires,8,10,45
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Compte-rendu détaillé si un import vient d'être exécuté -->
+{% if result %}
+  <div class="card border-0 shadow-sm rounded-3 mb-4 border-start border-4 {% if result.errors|length > 0 %}border-warning{% else %}border-success{% endif %}">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+      <h3 class="h6 mb-0 fw-bold">
+        <i class="bi bi-clipboard-data me-2"></i>Compte-rendu du dernier import
+      </h3>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-sm btn-success">
+        <i class="bi bi-box-seam me-1"></i> Accéder au Catalogue des Produits
+      </a>
+    </div>
+    <div class="card-body p-4">
+      <!-- 3 Cartes statistiques d'import -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+          <div class="p-3 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-25 text-center">
+            <div class="fs-2 fw-bold text-success">{{ result.added }}</div>
+            <div class="text-success fw-semibold small">Produit(s) créé(s)</div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <div class="p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-25 text-center">
+            <div class="fs-2 fw-bold text-primary">{{ result.updated }}</div>
+            <div class="text-primary fw-semibold small">Produit(s) mis à jour</div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <div class="p-3 rounded-3 {% if result.errors|length > 0 %}bg-warning bg-opacity-10 border border-warning border-opacity-50 text-warning-emphasis{% else %}bg-light border text-muted{% endif %} text-center">
+            <div class="fs-2 fw-bold">{{ result.errors|length }}</div>
+            <div class="fw-semibold small">Ligne(s) en anomalie / ignorée(s)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableau des erreurs ligne par ligne (si anomalies détectées) -->
+      {% if result.errors|length > 0 %}
+        <h4 class="h6 fw-bold text-danger mb-2">
+          <i class="bi bi-exclamation-octagon-fill me-1"></i>Détail des anomalies détectées
+        </h4>
+        <p class="text-muted small mb-3">
+          Les lignes suivantes ont été ignorées pour préserver l'intégrité de la base SQLite. Les lignes valides ont été importées avec succès.
+        </p>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 100px;">Ligne n°</th>
+                <th style="width: 150px;">Référence</th>
+                <th>Anomalie constatée</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for err in result.errors %}
+                <tr>
+                  <td class="font-monospace text-center fw-bold">{{ err.line }}</td>
+                  <td>
+                    <span class="badge bg-light text-dark font-monospace border">{{ err.reference }}</span>
+                  </td>
+                  <td class="text-danger small">{{ err.message }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert alert-success d-flex align-items-center mb-0" role="alert">
+          <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+          <div>Toutes les lignes du fichier ont été importées avec succès sans aucune erreur.</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}
