@@ -1,0 +1,19 @@
+reference,name,category,current_quantity,min_threshold,unit_price
+PC001,Ordinateur portable Dell Latitude 5540,Informatique,15,5,899.00
+PC002,Lenovo ThinkPad X1 Carbon Gen 11,Informatique,3,5,1350.00
+PC003,Apple MacBook Air M2 13 pouces,Informatique,8,4,1199.00
+EC001,Écran 27 pouces 4K Dell UltraSharp,Affichage,12,6,450.00
+EC002,Écran 24 pouces Full HD Iiyama ProLite,Affichage,25,8,169.90
+CL001,Clavier ergonomique sans fil Logitech MX Keys,Accessoires,4,10,99.90
+CL002,Clavier mécanique compact RGB Corsair K65,Accessoires,14,5,119.00
+SO001,Souris optique bureautique filaire HP,Accessoires,40,15,14.50
+SO002,Souris sans fil ergonomique Logitech MX Master 3S,Accessoires,2,6,89.00
+CA001,Casque audio avec micro Jabra Evolve2 65,Accessoires,1,5,149.00
+SW001,Switch Ethernet Cisco 24 ports Gigabit PoE,Réseau,6,3,520.00
+RO001,Routeur Wi-Fi 6 Pro Ubiquiti UniFi,Réseau,9,4,185.00
+CB001,Câble réseau Ethernet RJ45 Cat6 5m,Réseau,65,20,5.90
+CB002,Câble adaptateur HDMI vers USB-C 2m,Réseau,28,10,12.50
+SS001,Disque SSD NVMe Samsung 990 PRO 1To,Composants,18,8,110.00
+SS002,Disque dur externe 2To Western Digital,Composants,7,5,75.00
+BU001,Chaise de bureau ergonomique réglable,Mobilier,5,2,240.00
+BU002,Bureau assis-debout électrique 140x70cm,Mobilier,2,3,380.00
